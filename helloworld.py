@@ -3,7 +3,6 @@
 # Created by vici on 23/03/2017
 
 import tensorflow as tf
-import numpy as np
 
 
 if __name__ == '__main__':
@@ -28,6 +27,30 @@ if __name__ == '__main__':
     init = tf.global_variables_initializer()  # 初始化tf 内部全局变量
     sess1.run(init)  # 将全局变量添加到当前上下文
     print(sess1.run(liner_mode, {x: [1, 2, 3, 4]}))
+    y = tf.placeholder(tf.float32)
+    squared_deltas = tf.square(liner_mode - y)
+    loss = tf.reduce_sum(squared_deltas)   # # 上面三步为求 模型精度损失
+    print("the old module loss:", sess1.run(loss, {x: [1, 2, 3, 4], y: [0, -1, -2, -3]}))
+    fixw = tf.assign(w, [-1])
+    fixb = tf.assign(b, [1])  # 修改变量
+    sess1.run([fixb, fixw])
+    print("The fixed module loss: ", sess1.run(loss, {x: [1, 2, 3, 4], y: [0, -1, -2, -3]}))
+    # ------------------梯度下降训练模型-----------------
+    optimizer = tf.train.GradientDescentOptimizer(0.01)
+    train = optimizer.minimize(loss)
+    fixw2 = tf.assign(w, [1])
+    fixb2 = tf.assign(b, [2])  # 修改变量
+    sess1.run([fixw2, fixb2])
+    print("module loss before training: ", sess1.run(loss, {x: [1, 2, 3, 4], y: [0, -1, -2, -3]}))
+    for i in range(1000):
+        sess1.run(train, {x: [1, 2, 3, 4], y: [0, 1, 2, 3]})
+
+        print(sess1.run([w, b]))
+
+
+
+
+
 
 
 
